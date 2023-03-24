@@ -14,7 +14,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+
 
 class GeradorDePagamentoTest {
 
@@ -27,6 +31,9 @@ class GeradorDePagamentoTest {
     @Captor
     private ArgumentCaptor<Pagamento> captor;
 
+    @Mock
+    private Clock clock;
+
     @BeforeEach
     public void beforeEach() {
         MockitoAnnotations.initMocks(this);
@@ -37,6 +44,16 @@ class GeradorDePagamentoTest {
     void deveriaCriarPagamentoParaVencedorDoLeilao() {
         Leilao leilao = leilao();
         Lance vencedor = leilao.getLanceVencedor();
+
+
+
+
+        LocalDate data = LocalDate.of(2020, 12, 7);
+
+        Instant instant = data.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Mockito.when(clock.instant()).thenReturn(instant);
+        Mockito.when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+
         gerador.gerarPagamento(vencedor);
 
         Mockito.verify(pagamentoDao).salvar(captor.capture());
